@@ -3,7 +3,7 @@ class TagsController < ApplicationController
 
   # GET /tags or /tags.json
   def index
-    @tags = Tag.all
+    @tags = Tag.order(created_at: :desc)
   end
 
   # GET /tags/1 or /tags/1.json
@@ -25,9 +25,22 @@ class TagsController < ApplicationController
 
     respond_to do |format|
       if @tag.save
+        format.turbo_stream do
+          render turbo_stream: [
+               turbo_stream.update("new-tag", partial: "tags/form", locals: {tag: Tag.new}),
+               turbo_stream.prepend("tags", partial: "tags/tag", locals: {tag: @tag}),
+               turbo_stream.update("notice", html: "Tag was successfully created")
+          ]
+        end
         format.html { redirect_to tag_url(@tag), notice: "Tag was successfully created." }
         format.json { render :show, status: :created, location: @tag }
       else
+        format.turbo_stream do
+          render turbo_stream: [
+               turbo_stream.update("new-tag", partial: "tags/form", locals: {tag: @tag}),
+               turbo_stream.update("alert", html: "Tag was not successfully created")
+          ]
+        end
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @tag.errors, status: :unprocessable_entity }
       end
