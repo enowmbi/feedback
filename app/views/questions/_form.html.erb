@@ -18,12 +18,12 @@
 
   <div>
     <%= form.label :body, style: "display: block" %>
-    <%= form.text_field :body %>
+    <%= form.rich_text_area :body %>
   </div>
 
   <div>
     <%= form.label :user_id, style: "display: block" %>
-    <%= form.text_field :user_id %>
+    <%= form.text_field :user, value: current_user.email, readonly: true %>
   </div>
 
   <div>
